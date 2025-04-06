@@ -3,54 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحويل صورة إلى نص</title>
+    <title>إدارة قطع غيار السيارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #f0f4f7, #ffffff);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
 
-    <!-- تحميل خط Roboto من Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="styles.css">
+        h1 {
+            text-align: center;
+            color: #333;
+        }
 
-    <!-- رابط لملف manifest.json -->
-    <link rel="manifest" href="manifest.json">
+        h2 {
+            margin-top: 20px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            font-size: 24px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #e1e1e1;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            max-width: 120px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .card p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .card .part-title {
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            width: 48%;
+        }
+
+        /* خاصية خلفية المنسدلة */
+        select {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-    <h1>تحويل صورة إلى نص</h1>
-    
-    <!-- اختيار اللغة -->
-    <label for="languageSelect">اختر اللغة:</label>
-    <select id="languageSelect">
-        <option value="ara">العربية</option>
-        <option value="eng">الإنجليزية</option>
-        <option value="fra">الفرنسية</option>
+    <h1>إدارة قطع غيار السيارات</h1>
+
+    <h2>إضافة موديل سيارة جديد</h2>
+    <input type="text" id="newCarModel" placeholder="أدخل موديل السيارة" />
+    <select id="newEngineType">
+        <option value="petrol">بنزين</option>
+        <option value="diesel">ديزل</option>
     </select>
+    <button onclick="addCarModel()">إضافة موديل سيارة</button>
 
-    <br><br>
+    <h2>إضافة قطع غيار جديدة</h2>
+    <select id="carModelForPart">
+        <option value="">اختر موديل السيارة</option>
+        <!-- سيتم ملؤها ديناميكيًا -->
+    </select>
+    <input type="text" id="partName" placeholder="اسم القطعة" />
+    <input type="text" id="partNumber" placeholder="رقم القطعة" />
+    <input type="number" id="partPrice" placeholder="السعر" />
+    <input type="text" id="partDescription" placeholder="الوصف" />
+    <input type="text" id="partImage" placeholder="رابط الصورة" />
+    <button onclick="addPart()">إضافة قطع غيار</button>
 
-    <!-- إدخال الصورة -->
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="convertImageToText()">تحويل</button>
+    <div id="partsList"></div>
 
-    <!-- تحميل النص -->
-    <button id="downloadButton" style="display:none" onclick="downloadText()">تحميل النص</button>
+    <h2>حذف موديل سيارة</h2>
+    <select id="deleteCarModel">
+        <option value="">اختر موديل السيارة</option>
+        <!-- سيتم ملؤها ديناميكيًا -->
+    </select>
+    <button onclick="deleteCarModel()">حذف موديل السيارة</button>
 
-    <!-- النص الناتج -->
-    <p id="outputText">النص سيظهر هنا...</p>
+    <h2>حذف قطع غيار</h2>
+    <select id="deletePart">
+        <option value="">اختر القطعة</option>
+        <!-- سيتم ملؤها ديناميكيًا -->
+    </select>
+    <button onclick="deletePart()">حذف القطعة</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
-    <script src="script.js"></script>
-
-    <!-- تسجيل Service Worker -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((registration) => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.log('Service Worker registration failed:', error);
+        let db;
+
+        const request = indexedDB.open("carPartsDB", 1);
+
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("cars")) {
+                const store = db.createObjectStore("cars", { keyPath: "carModel" });
+                store.createIndex("engineType", "engineType", { unique: false });
+            }
+        };
+
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            loadCarPartsData(); // تحميل البيانات عند فتح قاعدة البيانات
+            loadCarModels(); // تحميل موديلات السيارات
+        };
+
+        request.onerror = function(e) {
+            console.error("Error opening database", e.target.error);
+        };
+
+        function loadCarModels() {
+            const transaction = db.transaction("cars", "readonly");
+            const store = transaction.objectStore("cars");
+            const request = store.getAll();
+
+            request.onsuccess = function(e) {
+                const carData = e.target.result;
+                const carModelSelects = document.querySelectorAll("select[id^='carModel']");
+                carModelSelects.forEach(select => {
+                    select.innerHTML = '<option value="">اختر موديل السيارة</option>';
+                    carData.forEach(car => {
+                        const option = document.createElement('option');
+                        option.value = car.carModel;
+                        option.textContent = car.carModel;
+                        select.appendChild(option);
                     });
-            });
+                });
+            };
+        }
+
+        function addCarModel() {
+            const newCarModel = document.getElementById("newCarModel").value;
+            const newEngineType = document.getElementById("newEngineType").value;
+
+            if (newCarModel && newEngineType) {
+                const transaction = db.transaction("cars", "readwrite");
+                const store = transaction.objectStore("cars");
+                const newCar = { carModel: newCarModel, engineType: newEngineType, parts: [] };
+                const request = store.put(newCar);
+
+                request.onsuccess = function() {
+                    alert("تم إضافة الموديل بنجاح!");
+                    loadCarModels(); // تحديث قائمة الموديلات
+                };
+
+                request.onerror = function(e) {
+                    console.error("Error adding car model", e.target.error);
+                };
+            }
+        }
+
+        function addPart() {
+            const carModel = document.getElementById("carModelForPart").value;
+            const partName = document.getElementById("partName").value;
+            const partNumber = document.getElementById("partNumber").value;
+            const partPrice = document.getElementById("partPrice").value;
+            const partDescription = document.getElementById("partDescription").value;
+            const partImage = document.getElementById("partImage").value;
+
+            if (carModel && partName && partNumber) {
+                const transaction = db.transaction("cars", "readwrite");
+                const store = transaction.objectStore("cars");
+                const request = store.get(carModel);
+
+                request.onsuccess = function(e) {
+                    const carData = e.target.result;
+
+                    if (carData) {
+                        carData.parts.push({
+                            name: partName,
+                            number: partNumber,
+                            price: partPrice,
+                            description: partDescription,
+                            image: partImage
+                        });
+
+                        const updateRequest = store.put(carData);
+
+                        updateRequest.onsuccess = function() {
+                            alert("تم إضافة القطعة بنجاح!");
+                            loadPartsForCar(carModel); // تحديث قطع الغيار المعروضة
+                        };
+                    }
+                };
+
+                request.onerror = function(e) {
+                    console.error("Error adding part", e.target.error);
+                };
+            }
+        }
+
+        function loadPartsForCar(carModel) {
+            const transaction = db.transaction("cars", "readonly");
+            const store = transaction.objectStore("cars");
+            const request = store.get(carModel);
+
+            request.onsuccess = function(e) {
+                const carData = e.target.result;
+                const partsList = document.getElementById("partsList");
+                partsList.innerHTML = ""; // مسح القائمة القديمة
+
+                if (carData && carData.parts.length > 0) {
+                    carData.parts.forEach(part => {
+                        const partCard = document.createElement("div");
+                        partCard.classList.add("card");
+                        partCard.innerHTML = `
+                            <img src="${part.image}" alt="Part Image">
+                            <div class="part-title">${part.name}</div>
+                            <p><strong>رقم القطعة:</strong> ${part.number}</p>
+                            <p><strong>السعر:</strong> ${part.price}</p>
+                            <p><strong>الوصف:</strong> ${part.description}</p>
+                        `;
+                        partsList.appendChild(partCard);
+                    });
+                } else {
+                    partsList.innerHTML = "<p>لا توجد قطع غيار لهذا الموديل.</p>";
+                }
+            };
         }
     </script>
 </body>
