@@ -507,6 +507,27 @@
         }
     }
 
+    function deleteCarModel() {
+        const carModel = document.getElementById("deleteCarModel").value;
+
+        if (carModel) {
+            const transaction = db.transaction("cars", "readwrite");
+            const store = transaction.objectStore("cars");
+            const request = store.delete(carModel);
+
+            request.onsuccess = function() {
+                alert(`تم حذف موديل السيارة ${carModel} بنجاح.`);
+                loadCarModels(); // إعادة تحميل موديلات السيارات بعد الحذف
+            };
+
+            request.onerror = function(e) {
+                console.error("Error deleting car model", e.target.error);
+            };
+        } else {
+            alert("يرجى اختيار موديل السيارة للحذف.");
+        }
+    }
 </script>
+               
 </body>
 </html>
