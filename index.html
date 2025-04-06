@@ -370,6 +370,95 @@
                 alert("يرجى اختيار موديل السيارة والقطعة أولاً.");
             }
         }
+        function addPartsForPeugeotModels() {
+    const peugeotModels = [
+        { carModel: "Peugeot 106", parts: [
+            { name: "فلتر هواء", number: "PA106A", price: "100", description: "فلتر هواء مخصص لسيارة Peugeot 106", image: "https://via.placeholder.com/150" },
+            { name: "مكابح أمامية", number: "PA106B", price: "250", description: "مكابح أمامية لسيارة Peugeot 106", image: "https://via.placeholder.com/150" },
+            { name: "مساعدات خلفية", number: "PA106C", price: "150", description: "مساعدات خلفية لسيارة Peugeot 106", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 206", parts: [
+            { name: "مكابح خلفية", number: "PA206A", price: "200", description: "مكابح خلفية لسيارة Peugeot 206", image: "https://via.placeholder.com/150" },
+            { name: "فلتر زيت", number: "PA206B", price: "75", description: "فلتر زيت لسيارة Peugeot 206", image: "https://via.placeholder.com/150" },
+            { name: "مصفاة بنزين", number: "PA206C", price: "120", description: "مصفاة بنزين لسيارة Peugeot 206", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 207", parts: [
+            { name: "مساعدات أمامية", number: "PA207A", price: "300", description: "مساعدات أمامية لسيارة Peugeot 207", image: "https://via.placeholder.com/150" },
+            { name: "شمعات إضاءة", number: "PA207B", price: "50", description: "شمعات إضاءة لسيارة Peugeot 207", image: "https://via.placeholder.com/150" },
+            { name: "فلتر هواء داخلية", number: "PA207C", price: "85", description: "فلتر هواء داخلية لسيارة Peugeot 207", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 208", parts: [
+            { name: "مساعدات أمامية", number: "PA208A", price: "320", description: "مساعدات أمامية لسيارة Peugeot 208", image: "https://via.placeholder.com/150" },
+            { name: "فلتر زيت", number: "PA208B", price: "100", description: "فلتر زيت لسيارة Peugeot 208", image: "https://via.placeholder.com/150" },
+            { name: "شمعات إضاءة", number: "PA208C", price: "55", description: "شمعات إضاءة لسيارة Peugeot 208", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 308", parts: [
+            { name: "فلتر هواء", number: "PA308A", price: "100", description: "فلتر هواء لسيارة Peugeot 308", image: "https://via.placeholder.com/150" },
+            { name: "مساعدات خلفية", number: "PA308B", price: "220", description: "مساعدات خلفية لسيارة Peugeot 308", image: "https://via.placeholder.com/150" },
+            { name: "مصفاة بنزين", number: "PA308C", price: "130", description: "مصفاة بنزين لسيارة Peugeot 308", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 508", parts: [
+            { name: "مكابح أمامية", number: "PA508A", price: "250", description: "مكابح أمامية لسيارة Peugeot 508", image: "https://via.placeholder.com/150" },
+            { name: "فلتر زيت", number: "PA508B", price: "90", description: "فلتر زيت لسيارة Peugeot 508", image: "https://via.placeholder.com/150" },
+            { name: "شمعات إضاءة", number: "PA508C", price: "45", description: "شمعات إضاءة لسيارة Peugeot 508", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 607", parts: [
+            { name: "مساعدات أمامية", number: "PA607A", price: "350", description: "مساعدات أمامية لسيارة Peugeot 607", image: "https://via.placeholder.com/150" },
+            { name: "شمعات إضاءة", number: "PA607B", price: "60", description: "شمعات إضاءة لسيارة Peugeot 607", image: "https://via.placeholder.com/150" },
+            { name: "فلتر هواء", number: "PA607C", price: "110", description: "فلتر هواء لسيارة Peugeot 607", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 2008", parts: [
+            { name: "مكابح خلفية", number: "PA2008A", price: "220", description: "مكابح خلفية لسيارة Peugeot 2008", image: "https://via.placeholder.com/150" },
+            { name: "مساعدات خلفية", number: "PA2008B", price: "180", description: "مساعدات خلفية لسيارة Peugeot 2008", image: "https://via.placeholder.com/150" },
+            { name: "فلتر زيت", number: "PA2008C", price: "85", description: "فلتر زيت لسيارة Peugeot 2008", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 3008", parts: [
+            { name: "فلتر هواء", number: "PA3008A", price: "120", description: "فلتر هواء لسيارة Peugeot 3008", image: "https://via.placeholder.com/150" },
+            { name: "مساعدات أمامية", number: "PA3008B", price: "240", description: "مساعدات أمامية لسيارة Peugeot 3008", image: "https://via.placeholder.com/150" },
+            { name: "شمعات إضاءة", number: "PA3008C", price: "55", description: "شمعات إضاءة لسيارة Peugeot 3008", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 4008", parts: [
+            { name: "مساعدات أمامية", number: "PA4008A", price: "310", description: "مساعدات أمامية لسيارة Peugeot 4008", image: "https://via.placeholder.com/150" },
+            { name: "فلتر زيت", number: "PA4008B", price: "95", description: "فلتر زيت لسيارة Peugeot 4008", image: "https://via.placeholder.com/150" },
+            { name: "مصفاة بنزين", number: "PA4008C", price: "130", description: "مصفاة بنزين لسيارة Peugeot 4008", image: "https://via.placeholder.com/150" }
+        ] },
+        { carModel: "Peugeot 5008", parts: [
+            { name: "فلتر هواء", number: "PA5008A", price: "110", description: "فلتر هواء لسيارة Peugeot 5008", image: "https://via.placeholder.com/150" },
+            { name: "مساعدات خلفية", number: "PA5008B", price: "220", description: "مساعدات خلفية لسيارة Peugeot 5008", image: "https://via.placeholder.com/150" },
+            { name: "شمعات إضاءة", number: "PA5008C", price: "60", description: "شمعات إضاءة لسيارة Peugeot 5008", image: "https://via.placeholder.com/150" }
+        ] }
+        // أضف بقية الموديلات بنفس الطريقة
+    ];
+
+    const transaction = db.transaction("cars", "readwrite");
+    const store = transaction.objectStore("cars");
+
+    peugeotModels.forEach(model => {
+        const request = store.get(model.carModel);
+        request.onsuccess = function(e) {
+            const carData = e.target.result;
+            if (carData) {
+                // إضافة القطع الجديدة
+                carData.parts = carData.parts.concat(model.parts);
+                const updateRequest = store.put(carData);
+                updateRequest.onsuccess = function() {
+                    console.log(`تم إضافة قطع الغيار لـ ${model.carModel}`);
+                };
+                updateRequest.onerror = function(e) {
+                    console.error(`خطأ في تحديث قطع الغيار لـ ${model.carModel}: `, e.target.error);
+                };
+            } else {
+                console.log(`موديل السيارة ${model.carModel} غير موجود في قاعدة البيانات.`);
+            }
+        };
+        request.onerror = function(e) {
+            console.error("خطأ في الحصول على موديل السيارة: ", e.target.error);
+        };
+    });
+}
+
+// استدعاء الدالة لإضافة قطع الغيار لجميع موديلات السيارات
+addPartsForPeugeotModels();
 
     </script>
 </body>
