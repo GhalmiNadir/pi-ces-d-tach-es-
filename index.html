@@ -1,271 +1,72 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة قطع غيار سيارات Peugeot</title>
-    <style>
-        .card { width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .card img { width: 100px; height: 100px; object-fit: cover; }
-        .part-title { font-weight: bold; font-size: 16px; }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <title>إضافة سيارات Peugeot إلى Firestore</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>إضافة موديلات Peugeot إلى Firestore</h1>
 
-<script>
-  const firebaseConfig = {
+  <script type="module">
+    // إعداد Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
   apiKey: "AIzaSyC_xnT8p3mnnmtjkdI9TvVWN0z_0QGSa-U",
   authDomain: "pieces-detachees-6ab33.firebaseapp.com",
   projectId: "pieces-detachees-6ab33",
-  storageBucket: "https://pi-ces-d-tach-es.vercel.app/",
+  storageBucket: "pieces-detachees-6ab33.firebasestorage.app",
   messagingSenderId: "647391578120",
   appId: "1:647391578120:web:4dfb17904ec5768777e9bd",
   measurementId: "G-9TZSKFNXHW"
 };
 
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore(app);
-</script>
-    <script>
-  // بيانات السيارات التي تريد إضافتها
-  const carModels = [
-    { car_id: "1", car_model: "Peugeot 106", car_name: "Peugeot 106", year: 1995 },
-    { car_id: "2", car_model: "Peugeot 206", car_name: "Peugeot 206", year: 2000 },
-    { car_id: "3", car_model: "Peugeot 207", car_name: "Peugeot 207", year: 2005 },
-    { car_id: "4", car_model: "Peugeot 208", car_name: "Peugeot 208", year: 2015 },
-    { car_id: "5", car_model: "Peugeot 306", car_name: "Peugeot 306", year: 1998 },
-    { car_id: "6", car_model: "Peugeot 307", car_name: "Peugeot 307", year: 2003 },
-    { car_id: "7", car_model: "Peugeot 308", car_name: "Peugeot 308", year: 2007 },
-    { car_id: "8", car_model: "Peugeot 406", car_name: "Peugeot 406", year: 2000 },
-    { car_id: "9", car_model: "Peugeot 407", car_name: "Peugeot 407", year: 2005 },
-    { car_id: "10", car_model: "Peugeot 508", car_name: "Peugeot 508", year: 2011 },
-    { car_id: "11", car_model: "Peugeot 607", car_name: "Peugeot 607", year: 2002 },
-    { car_id: "12", car_model: "Peugeot 2008", car_name: "Peugeot 2008", year: 2013 },
-    { car_id: "13", car_model: "Peugeot 3008", car_name: "Peugeot 3008", year: 2015 },
-    { car_id: "14", car_model: "Peugeot 4008", car_name: "Peugeot 4008", year: 2012 },
-    { car_id: "15", car_model: "Peugeot 5008", car_name: "Peugeot 5008", year: 2017 },
-    { car_id: "16", car_model: "Peugeot 408", car_name: "Peugeot 408", year: 2019 },
-    { car_id: "17", car_model: "Peugeot RCZ", car_name: "Peugeot RCZ", year: 2010 },
-    { car_id: "18", car_model: "Peugeot 208 GTi", car_name: "Peugeot 208 GTi", year: 2015 },
-    { car_id: "19", car_model: "Peugeot 308 GTi", car_name: "Peugeot 308 GTi", year: 2016 },
-    { car_id: "20", car_model: "Peugeot 9X8", car_name: "Peugeot 9X8", year: 2022 },
-    { car_id: "21", car_model: "Peugeot e-208", car_name: "Peugeot e-208", year: 2020 },
-    { car_id: "22", car_model: "Peugeot e-2008", car_name: "Peugeot e-2008", year: 2021 },
-    { car_id: "23", car_model: "Peugeot e-308", car_name: "Peugeot e-308", year: 2023 },
-    { car_id: "24", car_model: "Peugeot e-3008", car_name: "Peugeot e-3008", year: 2023 },
-    { car_id: "25", car_model: "Peugeot Partner", car_name: "Peugeot Partner", year: 2015 },
-    { car_id: "26", car_model: "Peugeot Expert", car_name: "Peugeot Expert", year: 2016 },
-    { car_id: "27", car_model: "Peugeot Rifter", car_name: "Peugeot Rifter", year: 2019 }
-  ];
 
-  // إضافة البيانات إلى Firestore
-  carModels.forEach(car => {
-    db.collection("cars").add({
-      car_id: car.car_id,
-      car_model: car.car_model,
-      car_name: car.car_name,
-      year: car.year
-    })
-    .then(docRef => {
-      console.log("تم إضافة السيارة: ", docRef.id);
-    })
-    .catch(error => {
-      console.error("خطأ في إضافة السيارة: ", error);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // بيانات السيارات
+    const cars = [
+      { car_id: "1", car_model: "106", car_name: "Peugeot 106", engine_type: "Petrol", year: 1995 },
+      { car_id: "2", car_model: "206", car_name: "Peugeot 206", engine_type: "Diesel", year: 2000 },
+      { car_id: "3", car_model: "207", car_name: "Peugeot 207", engine_type: "Petrol", year: 2005 },
+      { car_id: "4", car_model: "208", car_name: "Peugeot 208", engine_type: "Petrol", year: 2015 },
+      { car_id: "5", car_model: "306", car_name: "Peugeot 306", engine_type: "Diesel", year: 1998 },
+      { car_id: "6", car_model: "307", car_name: "Peugeot 307", engine_type: "Diesel", year: 2003 },
+      { car_id: "7", car_model: "308", car_name: "Peugeot 308", engine_type: "Petrol", year: 2007 },
+      { car_id: "8", car_model: "406", car_name: "Peugeot 406", engine_type: "Diesel", year: 2000 },
+      { car_id: "9", car_model: "407", car_name: "Peugeot 407", engine_type: "Petrol", year: 2005 },
+      { car_id: "10", car_model: "508", car_name: "Peugeot 508", engine_type: "Diesel", year: 2011 },
+      { car_id: "11", car_model: "607", car_name: "Peugeot 607", engine_type: "Diesel", year: 2002 },
+      { car_id: "12", car_model: "2008", car_name: "Peugeot 2008", engine_type: "Hybrid", year: 2013 },
+      { car_id: "13", car_model: "3008", car_name: "Peugeot 3008", engine_type: "Hybrid", year: 2015 },
+      { car_id: "14", car_model: "4008", car_name: "Peugeot 4008", engine_type: "Petrol", year: 2012 },
+      { car_id: "15", car_model: "5008", car_name: "Peugeot 5008", engine_type: "Diesel", year: 2017 },
+      { car_id: "16", car_model: "408", car_name: "Peugeot 408", engine_type: "Petrol", year: 2019 },
+      { car_id: "17", car_model: "RCZ", car_name: "Peugeot RCZ", engine_type: "Petrol", year: 2010 },
+      { car_id: "18", car_model: "208 GTi", car_name: "Peugeot 208 GTi", engine_type: "Petrol", year: 2015 },
+      { car_id: "19", car_model: "308 GTi", car_name: "Peugeot 308 GTi", engine_type: "Petrol", year: 2016 },
+      { car_id: "20", car_model: "9X8", car_name: "Peugeot 9X8", engine_type: "Electric", year: 2022 },
+      { car_id: "21", car_model: "e-208", car_name: "Peugeot e-208", engine_type: "Electric", year: 2020 },
+      { car_id: "22", car_model: "e-2008", car_name: "Peugeot e-2008", engine_type: "Electric", year: 2021 },
+      { car_id: "23", car_model: "e-308", car_name: "Peugeot e-308", engine_type: "Electric", year: 2023 },
+      { car_id: "24", car_model: "e-3008", car_name: "Peugeot e-3008", engine_type: "Electric", year: 2023 },
+      { car_id: "25", car_model: "Partner", car_name: "Peugeot Partner", engine_type: "Diesel", year: 2015 },
+      { car_id: "26", car_model: "Expert", car_name: "Peugeot Expert", engine_type: "Diesel", year: 2016 },
+      { car_id: "27", car_model: "Rifter", car_name: "Peugeot Rifter", engine_type: "Diesel", year: 2019 }
+    ];
+
+    // إضافة البيانات إلى Firestore
+    cars.forEach(async (car) => {
+      try {
+        await addDoc(collection(db, "cars"), car);
+        console.log(`تمت إضافة: ${car.car_name}`);
+      } catch (e) {
+        console.error("حدث خطأ أثناء الإضافة:", e);
+      }
     });
-  });
-    </script>
-    
-</head>
-<body>
-    <h1>إدارة قطع غيار سيارات Peugeot</h1>
-
-    <!-- إضافة موديلات السيارات -->
-    <h2>إضافة موديلات سيارات Peugeot</h2>
-    <button onclick="addPeugeotModelsIfEmpty()">إضافة موديلات Peugeot إذا كانت قاعدة البيانات فارغة</button>
-
-    <hr>
-
-    <!-- البحث عن قطع الغيار -->
-    <h2>البحث عن قطع الغيار</h2>
-    <label for="searchCarModel">اختيار موديل السيارة:</label>
-    <select id="searchCarModel" onchange="searchParts()">
-        <option value="">اختر موديل السيارة</option>
-    </select>
-    <div id="partsList"></div>
-
-    <hr>
-
-    <!-- حذف موديل السيارة -->
-    <h2>حذف موديل سيارة</h2>
-    <label for="deleteCarModel">اختيار موديل السيارة للحذف:</label>
-    <select id="deleteCarModel">
-        <option value="">اختر موديل السيارة</option>
-    </select>
-    <button onclick="deleteCarModel()">حذف موديل السيارة</button>
-
-    <script>
-        let db;
-
-        // فتح قاعدة البيانات
-        const request = indexedDB.open("carPartsDB", 1);
-
-        request.onupgradeneeded = function(e) {
-            db = e.target.result;
-            if (!db.objectStoreNames.contains("cars")) {
-                const store = db.createObjectStore("cars", { keyPath: "carModel" });
-                store.createIndex("engineType", "engineType", { unique: false });
-            }
-        };
-
-        request.onsuccess = function(e) {
-            db = e.target.result;
-            loadCarModels(); // تحميل موديلات السيارات عند فتح قاعدة البيانات
-            addPeugeotModelsIfEmpty(); // إضافة موديلات Peugeot إذا كانت قاعدة البيانات فارغة
-        };
-
-        request.onerror = function(e) {
-            console.error("Error opening database", e.target.error);
-        };
-
-        // إضافة موديلات سيارات Peugeot إذا كانت قاعدة البيانات فارغة
-        function addPeugeotModelsIfEmpty() {
-            const transaction = db.transaction("cars", "readwrite");
-            const store = transaction.objectStore("cars");
-            const request = store.getAll();
-
-            request.onsuccess = function(e) {
-                const carData = e.target.result;
-                if (carData.length === 0) {
-                    const peugeotModels = [
-                        { carModel: "Peugeot 106", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 206", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 207", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 208", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 306", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 307", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 308", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 406", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 407", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 508", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 607", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 2008", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 3008", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 4008", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 5008", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 408", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot RCZ", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 208 GTi", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 308 GTi", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot 9X8", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot e-208", engineType: "electric", parts: [] },
-                        { carModel: "Peugeot e-2008", engineType: "electric", parts: [] },
-                        { carModel: "Peugeot e-308", engineType: "electric", parts: [] },
-                        { carModel: "Peugeot e-3008", engineType: "electric", parts: [] },
-                        { carModel: "Peugeot Partner", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot Expert", engineType: "petrol", parts: [] },
-                        { carModel: "Peugeot Rifter", engineType: "petrol", parts: [] }
-                    ];
-
-                    peugeotModels.forEach(model => {
-                        store.put(model); // إضافة موديلات السيارات إلى قاعدة البيانات
-                    });
-
-                    alert("تم إضافة موديلات سيارات Peugeot بنجاح!");
-                    loadCarModels(); // إعادة تحميل موديلات السيارات بعد إضافتها
-                } else {
-                    loadCarModels(); // تحميل الموديلات من القاعدة إذا كانت قد أُضيفت مسبقًا
-                }
-            };
-
-            request.onerror = function(e) {
-                console.error("Error checking if database is empty", e.target.error);
-            };
-        }
-
-        // تحميل موديلات السيارات إلى قوائم الاختيار
-        function loadCarModels() {
-            const transaction = db.transaction("cars", "readonly");
-            const store = transaction.objectStore("cars");
-            const request = store.getAll();
-
-            request.onsuccess = function(e) {
-                const carData = e.target.result;
-                const carModelSelects = document.querySelectorAll("select[id^='carModel']");
-                
-                // ملء قوائم اختيار موديلات السيارة في البحث والإضافة
-                carModelSelects.forEach(select => {
-                    select.innerHTML = '<option value="">اختر موديل السيارة</option>';
-                    carData.forEach(car => {
-                        const option = document.createElement('option');
-                        option.value = car.carModel;
-                        option.textContent = car.carModel;
-                        select.appendChild(option);
-                    });
-                });
-            };
-        }
-
-        // البحث عن قطع الغيار للموديل المختار
-        function searchParts() {
-            const carModel = document.getElementById("searchCarModel").value;
-
-            if (carModel) {
-                const transaction = db.transaction("cars", "readonly");
-                const store = transaction.objectStore("cars");
-                const request = store.get(carModel);
-
-                request.onsuccess = function(e) {
-                    const carData = e.target.result;
-                    const partsList = document.getElementById("partsList");
-                    partsList.innerHTML = ""; // مسح القائمة القديمة
-
-                    if (carData && carData.parts.length > 0) {
-                        carData.parts.forEach(part => {
-                            const partCard = document.createElement("div");
-                            partCard.classList.add("card");
-                            partCard.innerHTML = `
-                                <img src="${part.image}" alt="Part Image">
-                                <div class="part-title">${part.name}</div>
-                                <p><strong>رقم القطعة:</strong> ${part.number}</p>
-                                <p><strong>السعر:</strong> ${part.price}</p>
-                                <p><strong>الوصف:</strong> ${part.description}</p>
-                            `;
-                            partsList.appendChild(partCard);
-                        });
-                    } else {
-                        partsList.innerHTML = "<p>لا توجد قطع غيار لهذا الموديل.</p>";
-                    }
-                };
-
-                request.onerror = function(e) {
-                    console.error("Error searching for parts", e.target.error);
-                };
-            } else {
-                alert("يرجى اختيار موديل السيارة أولاً.");
-            }
-        }
-
-        // حذف موديل السيارة
-        function deleteCarModel() {
-            const carModel = document.getElementById("deleteCarModel").value;
-
-            if (carModel) {
-                const transaction = db.transaction("cars", "readwrite");
-                const store = transaction.objectStore("cars");
-                const request = store.delete(carModel);
-
-                request.onsuccess = function() {
-                    alert(`تم حذف موديل السيارة ${carModel} بنجاح.`);
-                    loadCarModels(); // إعادة تحميل موديلات السيارات بعد الحذف
-                };
-
-                request.onerror = function(e) {
-                    console.error("Error deleting car model", e.target.error);
-                };
-            } else {
-                alert("يرجى اختيار موديل السيارة للحذف.");
-            }
-        }
-    </script>
+  </script>
 </body>
 </html>
