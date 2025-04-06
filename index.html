@@ -368,5 +368,103 @@
             };
         }
     </script>
+    <script>
+    let db;
+
+    const request = indexedDB.open("carPartsDB", 1);
+
+    request.onupgradeneeded = function(e) {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains("cars")) {
+            const store = db.createObjectStore("cars", { keyPath: "carModel" });
+            store.createIndex("engineType", "engineType", { unique: false });
+        }
+    };
+
+    request.onsuccess = function(e) {
+        db = e.target.result;
+        loadCarModels(); // تحميل موديلات السيارات عند فتح قاعدة البيانات
+
+        // إضافة موديلات سيارات Peugeot بشكل تلقائي إذا كانت قاعدة البيانات فارغة
+        addPeugeotModelsIfEmpty();
+    };
+
+    request.onerror = function(e) {
+        console.error("Error opening database", e.target.error);
+    };
+
+    function addPeugeotModelsIfEmpty() {
+        const transaction = db.transaction("cars", "readwrite");
+        const store = transaction.objectStore("cars");
+        const request = store.getAll();
+
+        request.onsuccess = function(e) {
+            const carData = e.target.result;
+            // إذا كانت قاعدة البيانات فارغة، نضيف موديلات Peugeot
+            if (carData.length === 0) {
+                const peugeotModels = [
+                    { carModel: "Peugeot 106", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 206", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 207", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 208", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 306", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 307", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 308", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 406", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 407", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 508", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 607", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 2008", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 3008", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 4008", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 5008", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 408", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot RCZ", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 208 GTi", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 308 GTi", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot 9X8", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot e-208", engineType: "electric", parts: [] },
+                    { carModel: "Peugeot e-2008", engineType: "electric", parts: [] },
+                    { carModel: "Peugeot e-308", engineType: "electric", parts: [] },
+                    { carModel: "Peugeot e-3008", engineType: "electric", parts: [] },
+                    { carModel: "Peugeot Partner", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot Expert", engineType: "petrol", parts: [] },
+                    { carModel: "Peugeot Rifter", engineType: "petrol", parts: [] }
+                ];
+
+                peugeotModels.forEach(model => {
+                    store.put(model); // إضافة موديلات السيارات إلى قاعدة البيانات
+                });
+
+                alert("تم إضافة موديلات سيارات Peugeot بنجاح!");
+                loadCarModels(); // إعادة تحميل موديلات السيارات بعد إضافتها
+            }
+        };
+
+        request.onerror = function(e) {
+            console.error("Error checking if database is empty", e.target.error);
+        };
+    }
+
+    function loadCarModels() {
+        const transaction = db.transaction("cars", "readonly");
+        const store = transaction.objectStore("cars");
+        const request = store.getAll();
+
+        request.onsuccess = function(e) {
+            const carData = e.target.result;
+            const carModelSelects = document.querySelectorAll("select[id^='carModel']");
+            carModelSelects.forEach(select => {
+                select.innerHTML = '<option value="">اختر موديل السيارة</option>';
+                carData.forEach(car => {
+                    const option = document.createElement('option');
+                    option.value = car.carModel;
+                    option.textContent = car.carModel;
+                    select.appendChild(option);
+                });
+            });
+        };
+    }
+                     </script>
 </body>
 </html>
