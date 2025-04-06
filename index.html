@@ -3,144 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة قطع غيار السيارات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>إدارة قطع الغيار - Peugeot</title>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to bottom, #f0f4f7, #ffffff);
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        h2 {
-            margin-top: 20px;
-            color: #333;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-            font-size: 24px;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .card {
-            background: #fff;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border: 1px solid #e1e1e1;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card img {
-            width: 100%;
-            max-width: 120px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .card p {
-            font-size: 16px;
-            color: #555;
-        }
-
-        .card .part-title {
-            font-size: 18px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .button-container button {
-            width: 48%;
-        }
-
-        select {
-            background-color: #f4f4f4;
-            color: #333;
-        }
+        .card { width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .card img { width: 100px; height: 100px; object-fit: cover; }
+        .part-title { font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
-    <h1>إدارة قطع غيار السيارات</h1>
+    <h1>إدارة قطع غيار سيارات Peugeot</h1>
 
-    <h2>إضافة موديل سيارة جديد</h2>
-    <input type="text" id="newCarModel" placeholder="أدخل موديل السيارة" />
-    <select id="newEngineType">
-        <option value="petrol">بنزين</option>
-        <option value="diesel">ديزل</option>
-    </select>
-    <button onclick="addCarModel()">إضافة موديل سيارة</button>
+    <!-- إضافة موديلات السيارات -->
+    <h2>إضافة موديلات سيارات Peugeot</h2>
+    <button onclick="addPeugeotModelsIfEmpty()">إضافة موديلات Peugeot إذا كانت قاعدة البيانات فارغة</button>
 
-    <h2>إضافة قطع غيار جديدة</h2>
-    <select id="carModelForPart">
+    <hr>
+
+    <!-- البحث عن قطع الغيار -->
+    <h2>البحث عن قطع الغيار</h2>
+    <label for="searchCarModel">اختيار موديل السيارة:</label>
+    <select id="searchCarModel" onchange="searchParts()">
         <option value="">اختر موديل السيارة</option>
     </select>
-    <input type="text" id="partName" placeholder="اسم القطعة" />
-    <input type="text" id="partNumber" placeholder="رقم القطعة" />
-    <input type="number" id="partPrice" placeholder="السعر" />
-    <input type="text" id="partDescription" placeholder="الوصف" />
-    <input type="text" id="partImage" placeholder="رابط الصورة" />
-    <button onclick="addPart()">إضافة قطع غيار</button>
-
-    <h2>البحث عن قطع غيار حسب موديل السيارة</h2>
-    <select id="searchCarModel">
-        <option value="">اختر موديل السيارة للبحث</option>
-    </select>
-    <button onclick="searchParts()">بحث</button>
-
     <div id="partsList"></div>
 
+    <hr>
+
+    <!-- حذف موديل السيارة -->
     <h2>حذف موديل سيارة</h2>
+    <label for="deleteCarModel">اختيار موديل السيارة للحذف:</label>
     <select id="deleteCarModel">
         <option value="">اختر موديل السيارة</option>
     </select>
     <button onclick="deleteCarModel()">حذف موديل السيارة</button>
 
-    <h2>حذف قطع غيار</h2>
-    <select id="deletePart">
-        <option value="">اختر القطعة</option>
-    </select>
-    <button onclick="deletePart()">حذف القطعة</button>
-
     <script>
         let db;
 
+        // فتح قاعدة البيانات
         const request = indexedDB.open("carPartsDB", 1);
 
         request.onupgradeneeded = function(e) {
@@ -153,13 +53,68 @@
 
         request.onsuccess = function(e) {
             db = e.target.result;
-            loadCarModels(); // تحميل موديلات السيارات
+            loadCarModels(); // تحميل موديلات السيارات عند فتح قاعدة البيانات
+            addPeugeotModelsIfEmpty(); // إضافة موديلات Peugeot إذا كانت قاعدة البيانات فارغة
         };
 
         request.onerror = function(e) {
             console.error("Error opening database", e.target.error);
         };
 
+        // إضافة موديلات سيارات Peugeot إذا كانت قاعدة البيانات فارغة
+        function addPeugeotModelsIfEmpty() {
+            const transaction = db.transaction("cars", "readwrite");
+            const store = transaction.objectStore("cars");
+            const request = store.getAll();
+
+            request.onsuccess = function(e) {
+                const carData = e.target.result;
+                if (carData.length === 0) {
+                    const peugeotModels = [
+                        { carModel: "Peugeot 106", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 206", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 207", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 208", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 306", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 307", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 308", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 406", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 407", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 508", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 607", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 2008", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 3008", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 4008", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 5008", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 408", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot RCZ", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 208 GTi", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 308 GTi", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot 9X8", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot e-208", engineType: "electric", parts: [] },
+                        { carModel: "Peugeot e-2008", engineType: "electric", parts: [] },
+                        { carModel: "Peugeot e-308", engineType: "electric", parts: [] },
+                        { carModel: "Peugeot e-3008", engineType: "electric", parts: [] },
+                        { carModel: "Peugeot Partner", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot Expert", engineType: "petrol", parts: [] },
+                        { carModel: "Peugeot Rifter", engineType: "petrol", parts: [] }
+                    ];
+
+                    peugeotModels.forEach(model => {
+                        store.put(model); // إضافة موديلات السيارات إلى قاعدة البيانات
+                    });
+
+                    alert("تم إضافة موديلات سيارات Peugeot بنجاح!");
+                    loadCarModels(); // إعادة تحميل موديلات السيارات بعد إضافتها
+                }
+            };
+
+            request.onerror = function(e) {
+                console.error("Error checking if database is empty", e.target.error);
+            };
+        }
+
+        // تحميل موديلات السيارات إلى قوائم الاختيار
         function loadCarModels() {
             const transaction = db.transaction("cars", "readonly");
             const store = transaction.objectStore("cars");
@@ -168,6 +123,8 @@
             request.onsuccess = function(e) {
                 const carData = e.target.result;
                 const carModelSelects = document.querySelectorAll("select[id^='carModel']");
+                
+                // ملء قوائم اختيار موديلات السيارة في البحث والإضافة
                 carModelSelects.forEach(select => {
                     select.innerHTML = '<option value="">اختر موديل السيارة</option>';
                     carData.forEach(car => {
@@ -180,67 +137,7 @@
             };
         }
 
-        function addCarModel() {
-            const newCarModel = document.getElementById("newCarModel").value;
-            const newEngineType = document.getElementById("newEngineType").value;
-
-            if (newCarModel && newEngineType) {
-                const transaction = db.transaction("cars", "readwrite");
-                const store = transaction.objectStore("cars");
-                const newCar = { carModel: newCarModel, engineType: newEngineType, parts: [] };
-                const request = store.put(newCar);
-
-                request.onsuccess = function() {
-                    alert("تم إضافة الموديل بنجاح!");
-                    loadCarModels(); // تحديث قائمة الموديلات
-                };
-
-                request.onerror = function(e) {
-                    console.error("Error adding car model", e.target.error);
-                };
-            }
-        }
-
-        function addPart() {
-            const carModel = document.getElementById("carModelForPart").value;
-            const partName = document.getElementById("partName").value;
-            const partNumber = document.getElementById("partNumber").value;
-            const partPrice = document.getElementById("partPrice").value;
-            const partDescription = document.getElementById("partDescription").value;
-            const partImage = document.getElementById("partImage").value;
-
-            if (carModel && partName && partNumber) {
-                const transaction = db.transaction("cars", "readwrite");
-                const store = transaction.objectStore("cars");
-                const request = store.get(carModel);
-
-                request.onsuccess = function(e) {
-                    const carData = e.target.result;
-
-                    if (carData) {
-                        carData.parts.push({
-                            name: partName,
-                            number: partNumber,
-                            price: partPrice,
-                            description: partDescription,
-                            image: partImage
-                        });
-
-                        const updateRequest = store.put(carData);
-
-                        updateRequest.onsuccess = function() {
-                            alert("تم إضافة القطعة بنجاح!");
-                            loadPartsForCar(carModel); // تحديث قطع الغيار المعروضة
-                        };
-                    }
-                };
-
-                request.onerror = function(e) {
-                    console.error("Error adding part", e.target.error);
-                };
-            }
-        }
-
+        // البحث عن قطع الغيار للموديل المختار
         function searchParts() {
             const carModel = document.getElementById("searchCarModel").value;
 
@@ -254,7 +151,7 @@
                     const partsList = document.getElementById("partsList");
                     partsList.innerHTML = ""; // مسح القائمة القديمة
 
-                    if (carData && carData.parts && carData.parts.length > 0) {
+                    if (carData && carData.parts.length > 0) {
                         carData.parts.forEach(part => {
                             const partCard = document.createElement("div");
                             partCard.classList.add("card");
@@ -280,6 +177,7 @@
             }
         }
 
+        // حذف موديل السيارة
         function deleteCarModel() {
             const carModel = document.getElementById("deleteCarModel").value;
 
@@ -289,245 +187,17 @@
                 const request = store.delete(carModel);
 
                 request.onsuccess = function() {
-                    alert("تم حذف موديل السيارة بنجاح!");
-                    loadCarModels(); // تحديث قائمة الموديلات
+                    alert(`تم حذف موديل السيارة ${carModel} بنجاح.`);
+                    loadCarModels(); // إعادة تحميل موديلات السيارات بعد الحذف
                 };
 
                 request.onerror = function(e) {
                     console.error("Error deleting car model", e.target.error);
                 };
-            }
-        }
-
-        function deletePart() {
-            const partName = document.getElementById("deletePart").value;
-            const carModel = document.getElementById("searchCarModel").value;
-
-            if (carModel && partName) {
-                const transaction = db.transaction("cars", "readwrite");
-                const store = transaction.objectStore("cars");
-                const request = store.get(carModel);
-
-                request.onsuccess = function(e) {
-                    const carData = e.target.result;
-
-                    if (carData) {
-                        const partIndex = carData.parts.findIndex(part => part.name === partName);
-
-                        if (partIndex !== -1) {
-                            carData.parts.splice(partIndex, 1); // حذف القطعة
-                            
-                            const updateRequest = store.put(carData);
-
-                            updateRequest.onsuccess = function() {
-                                alert("تم حذف القطعة بنجاح!");
-                                loadPartsForCar(carModel); // تحديث قائمة القطع المعروضة
-                            };
-                        }
-                    }
-                };
-
-                request.onerror = function(e) {
-                    console.error("Error deleting part", e.target.error);
-                };
             } else {
-                alert("يرجى اختيار موديل السيارة واسم القطعة أولاً.");
+                alert("يرجى اختيار موديل السيارة للحذف.");
             }
-        }
-
-        function loadPartsForCar(carModel) {
-            const transaction = db.transaction("cars", "readonly");
-            const store = transaction.objectStore("cars");
-            const request = store.get(carModel);
-
-            request.onsuccess = function(e) {
-                const carData = e.target.result;
-                const partsList = document.getElementById("partsList");
-                partsList.innerHTML = ""; // مسح القائمة القديمة
-
-                if (carData && carData.parts && carData.parts.length > 0) {
-                    carData.parts.forEach(part => {
-                        const partCard = document.createElement("div");
-                        partCard.classList.add("card");
-                        partCard.innerHTML = `
-                            <img src="${part.image}" alt="Part Image">
-                            <div class="part-title">${part.name}</div>
-                            <p><strong>رقم القطعة:</strong> ${part.number}</p>
-                            <p><strong>السعر:</strong> ${part.price}</p>
-                            <p><strong>الوصف:</strong> ${part.description}</p>
-                        `;
-                        partsList.appendChild(partCard);
-                    });
-                } else {
-                    partsList.innerHTML = "<p>لا توجد قطع غيار لهذا الموديل.</p>";
-                }
-            };
-
-            request.onerror = function(e) {
-                console.error("Error loading parts for car", e.target.error);
-            };
         }
     </script>
-    <script>
-    let db;
-
-    const request = indexedDB.open("carPartsDB", 1);
-
-    request.onupgradeneeded = function(e) {
-        db = e.target.result;
-        if (!db.objectStoreNames.contains("cars")) {
-            const store = db.createObjectStore("cars", { keyPath: "carModel" });
-            store.createIndex("engineType", "engineType", { unique: false });
-        }
-    };
-
-    request.onsuccess = function(e) {
-        db = e.target.result;
-        loadCarModels(); // تحميل موديلات السيارات عند فتح قاعدة البيانات
-
-        // إضافة موديلات سيارات Peugeot بشكل تلقائي إذا كانت قاعدة البيانات فارغة
-        addPeugeotModelsIfEmpty();
-    };
-
-    request.onerror = function(e) {
-        console.error("Error opening database", e.target.error);
-    };
-
-    function addPeugeotModelsIfEmpty() {
-        const transaction = db.transaction("cars", "readwrite");
-        const store = transaction.objectStore("cars");
-        const request = store.getAll();
-
-        request.onsuccess = function(e) {
-            const carData = e.target.result;
-            // إذا كانت قاعدة البيانات فارغة، نضيف موديلات Peugeot
-            if (carData.length === 0) {
-                const peugeotModels = [
-                    { carModel: "Peugeot 106", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 206", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 207", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 208", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 306", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 307", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 308", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 406", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 407", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 508", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 607", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 2008", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 3008", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 4008", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 5008", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 408", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot RCZ", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 208 GTi", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 308 GTi", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot 9X8", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot e-208", engineType: "electric", parts: [] },
-                    { carModel: "Peugeot e-2008", engineType: "electric", parts: [] },
-                    { carModel: "Peugeot e-308", engineType: "electric", parts: [] },
-                    { carModel: "Peugeot e-3008", engineType: "electric", parts: [] },
-                    { carModel: "Peugeot Partner", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot Expert", engineType: "petrol", parts: [] },
-                    { carModel: "Peugeot Rifter", engineType: "petrol", parts: [] }
-                ];
-
-                peugeotModels.forEach(model => {
-                    store.put(model); // إضافة موديلات السيارات إلى قاعدة البيانات
-                });
-
-                alert("تم إضافة موديلات سيارات Peugeot بنجاح!");
-                loadCarModels(); // إعادة تحميل موديلات السيارات بعد إضافتها
-            }
-        };
-
-        request.onerror = function(e) {
-            console.error("Error checking if database is empty", e.target.error);
-        };
-    }
-
-    function loadCarModels() {
-        const transaction = db.transaction("cars", "readonly");
-        const store = transaction.objectStore("cars");
-        const request = store.getAll();
-
-        request.onsuccess = function(e) {
-            const carData = e.target.result;
-            const carModelSelects = document.querySelectorAll("select[id^='carModel']");
-            
-            // ملء قوائم اختيار موديلات السيارة في البحث وإضافة موديلات السيارات
-            carModelSelects.forEach(select => {
-                select.innerHTML = '<option value="">اختر موديل السيارة</option>';
-                carData.forEach(car => {
-                    const option = document.createElement('option');
-                    option.value = car.carModel;
-                    option.textContent = car.carModel;
-                    select.appendChild(option);
-                });
-            });
-        };
-    }
-
-    function searchParts() {
-        const carModel = document.getElementById("searchCarModel").value;
-
-        if (carModel) {
-            const transaction = db.transaction("cars", "readonly");
-            const store = transaction.objectStore("cars");
-            const request = store.get(carModel);
-
-            request.onsuccess = function(e) {
-                const carData = e.target.result;
-                const partsList = document.getElementById("partsList");
-                partsList.innerHTML = ""; // مسح القائمة القديمة
-
-                if (carData && carData.parts.length > 0) {
-                    carData.parts.forEach(part => {
-                        const partCard = document.createElement("div");
-                        partCard.classList.add("card");
-                        partCard.innerHTML = `
-                            <img src="${part.image}" alt="Part Image">
-                            <div class="part-title">${part.name}</div>
-                            <p><strong>رقم القطعة:</strong> ${part.number}</p>
-                            <p><strong>السعر:</strong> ${part.price}</p>
-                            <p><strong>الوصف:</strong> ${part.description}</p>
-                        `;
-                        partsList.appendChild(partCard);
-                    });
-                } else {
-                    partsList.innerHTML = "<p>لا توجد قطع غيار لهذا الموديل.</p>";
-                }
-            };
-
-            request.onerror = function(e) {
-                console.error("Error searching for parts", e.target.error);
-            };
-        } else {
-            alert("يرجى اختيار موديل السيارة أولاً.");
-        }
-    }
-
-    function deleteCarModel() {
-        const carModel = document.getElementById("deleteCarModel").value;
-
-        if (carModel) {
-            const transaction = db.transaction("cars", "readwrite");
-            const store = transaction.objectStore("cars");
-            const request = store.delete(carModel);
-
-            request.onsuccess = function() {
-                alert(`تم حذف موديل السيارة ${carModel} بنجاح.`);
-                loadCarModels(); // إعادة تحميل موديلات السيارات بعد الحذف
-            };
-
-            request.onerror = function(e) {
-                console.error("Error deleting car model", e.target.error);
-            };
-        } else {
-            alert("يرجى اختيار موديل السيارة للحذف.");
-        }
-    }
-</script>
-               
 </body>
 </html>
