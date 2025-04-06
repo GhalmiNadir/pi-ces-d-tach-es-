@@ -9,6 +9,72 @@
         .card img { width: 100px; height: 100px; object-fit: cover; }
         .part-title { font-weight: bold; font-size: 16px; }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyC_xnT8p3mnnmtjkdI9TvVWN0z_0QGSa-U",
+  authDomain: "pieces-detachees-6ab33.firebaseapp.com",
+  projectId: "pieces-detachees-6ab33",
+  storageBucket: "https://pi-ces-d-tach-es.vercel.app/",
+  messagingSenderId: "647391578120",
+  appId: "1:647391578120:web:4dfb17904ec5768777e9bd",
+  measurementId: "G-9TZSKFNXHW"
+};
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore(app);
+</script>
+    <script>
+  // بيانات السيارات التي تريد إضافتها
+  const carModels = [
+    { car_id: "1", car_model: "Peugeot 106", car_name: "Peugeot 106", year: 1995 },
+    { car_id: "2", car_model: "Peugeot 206", car_name: "Peugeot 206", year: 2000 },
+    { car_id: "3", car_model: "Peugeot 207", car_name: "Peugeot 207", year: 2005 },
+    { car_id: "4", car_model: "Peugeot 208", car_name: "Peugeot 208", year: 2015 },
+    { car_id: "5", car_model: "Peugeot 306", car_name: "Peugeot 306", year: 1998 },
+    { car_id: "6", car_model: "Peugeot 307", car_name: "Peugeot 307", year: 2003 },
+    { car_id: "7", car_model: "Peugeot 308", car_name: "Peugeot 308", year: 2007 },
+    { car_id: "8", car_model: "Peugeot 406", car_name: "Peugeot 406", year: 2000 },
+    { car_id: "9", car_model: "Peugeot 407", car_name: "Peugeot 407", year: 2005 },
+    { car_id: "10", car_model: "Peugeot 508", car_name: "Peugeot 508", year: 2011 },
+    { car_id: "11", car_model: "Peugeot 607", car_name: "Peugeot 607", year: 2002 },
+    { car_id: "12", car_model: "Peugeot 2008", car_name: "Peugeot 2008", year: 2013 },
+    { car_id: "13", car_model: "Peugeot 3008", car_name: "Peugeot 3008", year: 2015 },
+    { car_id: "14", car_model: "Peugeot 4008", car_name: "Peugeot 4008", year: 2012 },
+    { car_id: "15", car_model: "Peugeot 5008", car_name: "Peugeot 5008", year: 2017 },
+    { car_id: "16", car_model: "Peugeot 408", car_name: "Peugeot 408", year: 2019 },
+    { car_id: "17", car_model: "Peugeot RCZ", car_name: "Peugeot RCZ", year: 2010 },
+    { car_id: "18", car_model: "Peugeot 208 GTi", car_name: "Peugeot 208 GTi", year: 2015 },
+    { car_id: "19", car_model: "Peugeot 308 GTi", car_name: "Peugeot 308 GTi", year: 2016 },
+    { car_id: "20", car_model: "Peugeot 9X8", car_name: "Peugeot 9X8", year: 2022 },
+    { car_id: "21", car_model: "Peugeot e-208", car_name: "Peugeot e-208", year: 2020 },
+    { car_id: "22", car_model: "Peugeot e-2008", car_name: "Peugeot e-2008", year: 2021 },
+    { car_id: "23", car_model: "Peugeot e-308", car_name: "Peugeot e-308", year: 2023 },
+    { car_id: "24", car_model: "Peugeot e-3008", car_name: "Peugeot e-3008", year: 2023 },
+    { car_id: "25", car_model: "Peugeot Partner", car_name: "Peugeot Partner", year: 2015 },
+    { car_id: "26", car_model: "Peugeot Expert", car_name: "Peugeot Expert", year: 2016 },
+    { car_id: "27", car_model: "Peugeot Rifter", car_name: "Peugeot Rifter", year: 2019 }
+  ];
+
+  // إضافة البيانات إلى Firestore
+  carModels.forEach(car => {
+    db.collection("cars").add({
+      car_id: car.car_id,
+      car_model: car.car_model,
+      car_name: car.car_name,
+      year: car.year
+    })
+    .then(docRef => {
+      console.log("تم إضافة السيارة: ", docRef.id);
+    })
+    .catch(error => {
+      console.error("خطأ في إضافة السيارة: ", error);
+    });
+  });
+    </script>
+    
 </head>
 <body>
     <h1>إدارة قطع غيار سيارات Peugeot</h1>
