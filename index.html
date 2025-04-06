@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة قطع غيار السيارات</title>
+    <title>Peugeot إدارة قطع غيار السيارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -119,6 +119,13 @@
     <input type="text" id="partDescription" placeholder="الوصف" />
     <input type="text" id="partImage" placeholder="رابط الصورة" />
     <button onclick="addPart()">إضافة قطع غيار</button>
+
+    <h2>البحث عن قطع غيار حسب موديل السيارة</h2>
+    <select id="searchCarModel">
+        <option value="">اختر موديل السيارة للبحث</option>
+        <!-- سيتم ملؤها ديناميكيًا -->
+    </select>
+    <button onclick="searchParts()">بحث</button>
 
     <div id="partsList"></div>
 
@@ -268,6 +275,102 @@
                 }
             };
         }
+
+        function searchParts() {
+            const carModel = document.getElementById("searchCarModel").value;
+
+            if (carModel) {
+                const transaction = db.transaction("cars", "readonly");
+                const store = transaction.objectStore("cars");
+                const request = store.get(carModel);
+
+                request.onsuccess = function(e) {
+                    const carData = e.target.result;
+                    const partsList = document.getElementById("partsList");
+                    partsList.innerHTML = ""; // مسح القائمة القديمة
+
+                    if (carData && carData.parts.length > 0) {
+                        carData.parts.forEach(part => {
+                            const partCard = document.createElement("div");
+                            partCard.classList.add("card");
+                            partCard.innerHTML = `
+                                <img src="${part.image}" alt="Part Image">
+                                <div class="part-title">${part.name}</div>
+                                <p><strong>رقم القطعة:</strong> ${part.number}</p>
+                                <p><strong>السعر:</strong> ${part.price}</p>
+                                <p><strong>الوصف:</strong> ${part.description}</p>
+                            `;
+                            partsList.appendChild(partCard);
+                        });
+                    } else {
+                        partsList.innerHTML = "<p>لا توجد قطع غيار لهذا الموديل.</p>";
+                    }
+                };
+
+                request.onerror = function(e) {
+                    console.error("Error searching for parts", e.target.error);
+                };
+            } else {
+                alert("يرجى اختيار موديل السيارة أولاً.");
+            }
+        }
+
+        function deleteCarModel() {
+            const carModel = document.getElementById("deleteCarModel").value;
+
+            if (carModel) {
+                const transaction = db.transaction("cars", "readwrite");
+                const store = transaction.objectStore("cars");
+                const request = store.delete(carModel);
+
+                request.onsuccess = function() {
+                    alert("تم حذف موديل السيارة بنجاح!");
+                    loadCarModels(); // تحديث قائمة الموديلات
+                };
+
+                request.onerror = function(e) {
+                    console.error("Error deleting car model", e.target.error);
+                };
+            }
+        }
+
+        function deletePart() {
+            const partName = document.getElementById("deletePart").value;
+            const carModel = document.getElementById("searchCarModel").value;
+
+            if (carModel && partName) {
+                const transaction = db.transaction("cars", "readwrite");
+                const store = transaction.objectStore("cars");
+                const request = store.get(carModel);
+
+                request.onsuccess = function(e) {
+                    const carData = e.target.result;
+
+                    if (carData) {
+                        const partIndex = carData.parts.findIndex(part => part.name === partName);
+
+                        if (partIndex !== -1) {
+                            carData.parts.splice(partIndex, 1);
+                            const updateRequest = store.put(carData);
+
+                            updateRequest.onsuccess = function() {
+                                alert("تم حذف القطعة بنجاح!");
+                                loadPartsForCar(carModel); // تحديث قطع الغيار المعروضة
+                            };
+                        } else {
+                            alert("لم يتم العثور على القطعة.");
+                        }
+                    }
+                };
+
+                request.onerror = function(e) {
+                    console.error("Error deleting part", e.target.error);
+                };
+            } else {
+                alert("يرجى اختيار موديل السيارة والقطعة أولاً.");
+            }
+        }
+
     </script>
 </body>
 </html>
