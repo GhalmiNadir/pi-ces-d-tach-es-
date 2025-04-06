@@ -454,6 +454,8 @@
         request.onsuccess = function(e) {
             const carData = e.target.result;
             const carModelSelects = document.querySelectorAll("select[id^='carModel']");
+            
+            // ملء قوائم اختيار موديلات السيارة في البحث وإضافة موديلات السيارات
             carModelSelects.forEach(select => {
                 select.innerHTML = '<option value="">اختر موديل السيارة</option>';
                 carData.forEach(car => {
@@ -465,6 +467,46 @@
             });
         };
     }
-                     </script>
+
+    function searchParts() {
+        const carModel = document.getElementById("searchCarModel").value;
+
+        if (carModel) {
+            const transaction = db.transaction("cars", "readonly");
+            const store = transaction.objectStore("cars");
+            const request = store.get(carModel);
+
+            request.onsuccess = function(e) {
+                const carData = e.target.result;
+                const partsList = document.getElementById("partsList");
+                partsList.innerHTML = ""; // مسح القائمة القديمة
+
+                if (carData && carData.parts.length > 0) {
+                    carData.parts.forEach(part => {
+                        const partCard = document.createElement("div");
+                        partCard.classList.add("card");
+                        partCard.innerHTML = `
+                            <img src="${part.image}" alt="Part Image">
+                            <div class="part-title">${part.name}</div>
+                            <p><strong>رقم القطعة:</strong> ${part.number}</p>
+                            <p><strong>السعر:</strong> ${part.price}</p>
+                            <p><strong>الوصف:</strong> ${part.description}</p>
+                        `;
+                        partsList.appendChild(partCard);
+                    });
+                } else {
+                    partsList.innerHTML = "<p>لا توجد قطع غيار لهذا الموديل.</p>";
+                }
+            };
+
+            request.onerror = function(e) {
+                console.error("Error searching for parts", e.target.error);
+            };
+        } else {
+            alert("يرجى اختيار موديل السيارة أولاً.");
+        }
+    }
+
+</script>
 </body>
 </html>
